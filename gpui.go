@@ -1,26 +1,36 @@
 package gogpui
 
 import (
+	"image/color"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type State any
+
 type Renderable interface {
-	Render()
+	Render() State
 }
 
 type Text struct {
-	text string
+	Color  color.RGBA
+	String string
 }
 
-func (t *Text) Render() {
+func (t *Text) Render() State {
+	rl.DrawText(t.String, 10, 10, 15, t.Color)
+	return nil
 }
 
 type Button struct {
 	Label string
 }
+type ButtonState struct {
+	Pressed bool
+}
 
-func (b *Button) Render() {
-
+func (b *Button) Render() State {
+	return nil
 }
 
 type List struct {
@@ -39,6 +49,7 @@ const (
 
 const (
 	EventType_KeyPress = iota + 1
+	EventType_KeyPressRepeat
 	EventType_MouseClick
 	EventType_ScrollWheel
 	EventType_DragDrop
@@ -69,6 +80,11 @@ type KeyPressEvent struct {
 	KeyCode int32
 }
 
+type KeyPressRepeatEvent struct {
+	Mods    uint8
+	KeyCode int32
+}
+
 type DragDropEvent struct {
 	File string
 }
@@ -78,7 +94,7 @@ type WindowContext struct {
 	Width  int
 }
 
-type Handler func(windowContext WindowContext, frameEvents []Event) Renderable
+type Handler func(windowContext WindowContext, frameEvents []Event)
 
 type GPUI struct {
 	handler Handler
@@ -113,8 +129,8 @@ func (g *GPUI) Start() {
 		Rotation: 0.0,
 		Zoom:     1.0,
 	}
-	var frameEvents []Event
 	for !rl.WindowShouldClose() {
+		var frameEvents []Event
 		windowCtx := WindowContext{
 			Height: rl.GetScreenHeight(),
 			Width:  rl.GetScreenWidth(),
@@ -134,11 +150,24 @@ func (g *GPUI) Start() {
 		}
 		// Keyboard
 		for i := int32(0); i <= int32(350); i++ {
-			lastKey := pressed(i)
+			lastKey := rl.IsKeyPressed(i)
 			if lastKey {
 				frameEvents = append(frameEvents, Event{
 					Type: EventType_KeyPress,
 					Data: KeyPressEvent{
+						Mods:    uint8(mods),
+						KeyCode: i,
+					},
+				})
+
+			}
+		}
+		for i := int32(0); i <= int32(350); i++ {
+			lastKey := rl.IsKeyPressedRepeat(i)
+			if lastKey {
+				frameEvents = append(frameEvents, Event{
+					Type: EventType_KeyPressRepeat,
+					Data: KeyPressRepeatEvent{
 						Mods:    uint8(mods),
 						KeyCode: i,
 					},
@@ -199,11 +228,10 @@ func (g *GPUI) Start() {
 				})
 			}
 		}
-		renderable := g.handler(windowCtx, frameEvents)
+
 		rl.BeginDrawing()
-		rl.ClearBackground(rl.Red)
 		rl.BeginMode2D(camera)
-		renderable.Render()
+		g.handler(windowCtx, frameEvents)
 		rl.EndMode2D()
 		rl.EndDrawing()
 	}
