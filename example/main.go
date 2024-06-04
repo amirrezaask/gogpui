@@ -9,9 +9,10 @@ import (
 
 var (
 	textColor = rl.White
+	font      rl.Font
 )
 
-func handler(windowCtx gpui.WindowContext, frameEvents []gpui.Event) {
+func handler(g *gpui.GPUI, windowCtx gpui.WindowContext, frameEvents []gpui.Event) {
 	if len(frameEvents) > 0 {
 		fmt.Println("======")
 		for _, evt := range frameEvents {
@@ -28,12 +29,20 @@ func handler(windowCtx gpui.WindowContext, frameEvents []gpui.Event) {
 			}
 		}
 	}
-	text := &gpui.Text{String: "Hello", Color: textColor}
-	text.Render()
+	text := &gpui.Text{TextSize: 50, String: "Hello", Color: textColor}
+	button := &gpui.Button{Label: "Button1", FillColor: rl.White}
+
+	text.Render(g, windowCtx.Area(), frameEvents)
+	if button.Render(g, rl.Rectangle{
+		X: 200, Y: 200, Height: windowCtx.Height / 2, Width: windowCtx.Width / 2,
+	}, frameEvents).(gpui.ButtonState).Pressed {
+		fmt.Println("Pressed the button")
+	}
 }
 
 func main() {
 	gpui.
 		New(handler).
+		WithFont("LiberationMono.ttf").
 		Start()
 }

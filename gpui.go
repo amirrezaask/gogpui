@@ -2,6 +2,7 @@ package gogpui
 
 import (
 	"image/color"
+	"os"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -9,103 +10,54 @@ import (
 type State any
 
 type Renderable interface {
-	Render() State
-}
-
-type Text struct {
-	Color  color.RGBA
-	String string
-}
-
-func (t *Text) Render() State {
-	rl.DrawText(t.String, 10, 10, 15, t.Color)
-	return nil
-}
-
-type Button struct {
-	Label string
-}
-type ButtonState struct {
-	Pressed bool
-}
-
-func (b *Button) Render() State {
-	return nil
-}
-
-type List struct {
-	Items []Renderable
-}
-
-func (l *List) Render() {
-
-}
-
-const (
-	MOD_CTRL uint8 = 1 << iota
-	MOD_ALT
-	MOD_SHIFT
-)
-
-const (
-	EventType_KeyPress = iota + 1
-	EventType_KeyPressRepeat
-	EventType_MouseClick
-	EventType_ScrollWheel
-	EventType_DragDrop
-)
-const (
-	SCROLL_SPEED_Y = 5
-	SCROLL_SPEED_X = 10
-)
-
-type Event struct {
-	Type int
-	Data any
-}
-
-type ScrollWheelEvent struct {
-	V    rl.Vector2
-	Mods uint8
-}
-
-type MouseClickEvent struct {
-	MouseKeyCode int32
-	Mods         uint8
-	Position     rl.Vector2
-}
-
-type KeyPressEvent struct {
-	Mods    uint8
-	KeyCode int32
-}
-
-type KeyPressRepeatEvent struct {
-	Mods    uint8
-	KeyCode int32
-}
-
-type DragDropEvent struct {
-	File string
+	Render(g *GPUI, area rl.Rectangle) State
 }
 
 type WindowContext struct {
-	Height int
-	Width  int
+	Height float32
+	Width  float32
 }
 
-type Handler func(windowContext WindowContext, frameEvents []Event)
+func (w *WindowContext) Area() rl.Rectangle {
+	return rl.Rectangle{
+		X:      0,
+		Y:      0,
+		Width:  float32(w.Width),
+		Height: float32(w.Height),
+	}
+}
+
+type Handler func(g *GPUI, windowContext WindowContext, frameEvents []Event)
 
 type GPUI struct {
-	handler Handler
+	fontName string
+	fontData []byte
+	fontMap  map[int]rl.Font
+	handler  Handler
+}
+
+func (g *GPUI) DrawTextAt(text string, fontsize int, at rl.Vector2, c color.RGBA) {
+	rl.DrawTextEx(g.GetFont(fontsize), text, rl.Vector2{X: at.X, Y: at.Y}, float32(fontsize), 0, c)
+}
+
+func (g *GPUI) GetFont(fontSize int) rl.Font {
+	if font, exists := g.fontMap[fontSize]; exists {
+		return font
+	}
+
+	g.fontMap[fontSize] = rl.LoadFontEx(g.fontName, int32(fontSize), nil)
+	return g.fontMap[fontSize]
+}
+
+type Option func(*GPUI)
+
+func (g *GPUI) WithFont(font string) *GPUI {
+	g.fontName = font
+	return g
 }
 
 func New(handler Handler) *GPUI {
-	return &GPUI{handler: handler}
-}
-
-func pressed(key int32) bool {
-	return rl.IsKeyPressed(key) || rl.IsKeyPressedRepeat(key)
+	return &GPUI{handler: handler, fontMap: make(map[int]rl.Font)}
 }
 
 func (g *GPUI) Start() {
@@ -118,6 +70,12 @@ func (g *GPUI) Start() {
 
 	rl.InitWindow(screenWidth, screenHeight, "TITLE")
 	defer rl.CloseWindow()
+
+	fontData, err := os.ReadFile(g.fontName)
+	if err != nil {
+		panic(err)
+	}
+	g.fontData = fontData
 
 	rl.SetExitKey(rl.KeyNull)
 
@@ -132,8 +90,8 @@ func (g *GPUI) Start() {
 	for !rl.WindowShouldClose() {
 		var frameEvents []Event
 		windowCtx := WindowContext{
-			Height: rl.GetScreenHeight(),
-			Width:  rl.GetScreenWidth(),
+			Height: float32(rl.GetScreenHeight()),
+			Width:  float32(rl.GetScreenWidth()),
 		}
 		ctrl := rl.IsKeyDown(rl.KeyLeftControl) || rl.IsKeyDown(rl.KeyRightControl)
 		alt := rl.IsKeyDown(rl.KeyLeftAlt) || rl.IsKeyDown(rl.KeyRightAlt)
@@ -231,7 +189,8 @@ func (g *GPUI) Start() {
 
 		rl.BeginDrawing()
 		rl.BeginMode2D(camera)
-		g.handler(windowCtx, frameEvents)
+		rl.ClearBackground(rl.Black)
+		g.handler(g, windowCtx, frameEvents)
 		rl.EndMode2D()
 		rl.EndDrawing()
 	}
