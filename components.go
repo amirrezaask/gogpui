@@ -17,7 +17,9 @@ func (t *Text) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) {
 }
 
 type Button struct {
+	TextSize  int
 	FillColor color.RGBA
+	TextColor color.RGBA
 	Label     string
 }
 type ButtonState struct {
@@ -40,6 +42,11 @@ func (b *Button) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) bool {
 	} else {
 		g.DrawRectangle(area, 2, b.FillColor)
 	}
+
+	g.DrawTextAt(b.Label, b.TextSize, rl.Vector2{
+		X: area.X + area.Width*2/3,
+		Y: area.Y + area.Height/2,
+	}, b.TextColor)
 
 	return pressed
 }
