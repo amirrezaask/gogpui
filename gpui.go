@@ -40,6 +40,14 @@ func (g *GPUI) DrawTextAt(text string, fontsize int, at rl.Vector2, c color.RGBA
 	rl.DrawTextEx(g.GetFont(fontsize), text, rl.Vector2{X: at.X, Y: at.Y}, float32(fontsize), 0, c)
 }
 
+func (g *GPUI) DrawRectangle(area rl.Rectangle, lineThick int, borderColor color.RGBA) {
+	rl.DrawRectangleLinesEx(area, 2, borderColor)
+}
+
+func (g *GPUI) DrawFilledRectangle(area rl.Rectangle, fillColor color.RGBA) {
+	rl.DrawRectangleRec(area, fillColor)
+}
+
 func (g *GPUI) GetFont(fontSize int) rl.Font {
 	if font, exists := g.fontMap[fontSize]; exists {
 		return font

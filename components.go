@@ -37,18 +37,25 @@ func (b *Button) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) State {
 		}
 	}
 	if pressed {
-		rl.DrawRectangleRec(area, b.FillColor)
+		g.DrawFilledRectangle(area, b.FillColor)
 	} else {
-		rl.DrawRectangleLinesEx(area, 2, b.FillColor)
+		g.DrawRectangle(area, 2, b.FillColor)
 	}
 
 	return ButtonState{Pressed: pressed}
 }
 
-type List struct {
-	Items []Renderable
-}
+func ColumnarAreas(screenArea rl.Rectangle, columnCount int) []rl.Rectangle {
+	columnWidth := screenArea.Width / float32(columnCount)
+	var columns []rl.Rectangle
+	for i := 0; i < columnCount; i++ {
+		columns = append(columns, rl.Rectangle{
+			X:      float32(i) * columnWidth,
+			Width:  float32(i)*columnWidth + columnWidth,
+			Y:      screenArea.Y,
+			Height: screenArea.Height,
+		})
+	}
 
-func (l *List) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) {
-
+	return columns
 }
