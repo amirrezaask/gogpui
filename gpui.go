@@ -7,12 +7,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-type State any
-
-type Renderable interface {
-	Render(g *GPUI, area rl.Rectangle) State
-}
-
 type WindowContext struct {
 	Height float32
 	Width  float32

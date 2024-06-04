@@ -12,9 +12,8 @@ type Text struct {
 	String   string
 }
 
-func (t *Text) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) State {
+func (t *Text) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) {
 	g.DrawTextAt(t.String, t.TextSize, rl.Vector2{X: area.X, Y: area.Y}, t.Color)
-	return nil
 }
 
 type Button struct {
@@ -25,7 +24,7 @@ type ButtonState struct {
 	Pressed bool
 }
 
-func (b *Button) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) State {
+func (b *Button) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) bool {
 	pressed := false
 	for _, evt := range frameEvents {
 		if evt.Type == EventType_MouseClick {
@@ -42,7 +41,7 @@ func (b *Button) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) State {
 		g.DrawRectangle(area, 2, b.FillColor)
 	}
 
-	return ButtonState{Pressed: pressed}
+	return pressed
 }
 
 func ColumnarAreas(screenArea rl.Rectangle, columnCount int) []rl.Rectangle {
