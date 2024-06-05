@@ -9,9 +9,15 @@ import (
 
 func main() {
 	gpui.New(func(g *gpui.GPUI, windowCtx gpui.WindowContext, frameEvents []gpui.Event) {
-		button := &gpui.Button{Label: "Button1", FillColor: rl.White, TextSize: 15, TextColor: rl.White}
-		buttonState := button.Render(g, rl.Rectangle{X: 200, Y: 200, Height: windowCtx.Height / 2, Width: windowCtx.Width / 2}, frameEvents)
-		if buttonState {
+		pressed := gpui.Button(g,
+			rl.Rectangle{X: 200, Y: 200, Height: windowCtx.Height / 2, Width: windowCtx.Width / 2},
+			frameEvents,
+			15,
+			rl.White,
+			rl.White,
+			"Button1",
+		)
+		if pressed {
 			fmt.Println("Pressed")
 		}
 	}).

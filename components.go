@@ -6,27 +6,17 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-type Text struct {
-	TextSize int
-	Color    color.RGBA
-	String   string
+func Text(g *GPUI, area rl.Rectangle, frameEvents []Event, TextSize int, Color color.RGBA, String string) {
+	g.DrawTextAt(String, TextSize, rl.Vector2{X: area.X, Y: area.Y}, Color)
 }
 
-func (t *Text) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) {
-	g.DrawTextAt(t.String, t.TextSize, rl.Vector2{X: area.X, Y: area.Y}, t.Color)
-}
-
-type Button struct {
-	TextSize  int
-	FillColor color.RGBA
-	TextColor color.RGBA
-	Label     string
-}
-type ButtonState struct {
-	Pressed bool
-}
-
-func (b *Button) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) bool {
+func Button(g *GPUI,
+	area rl.Rectangle,
+	frameEvents []Event,
+	TextSize int,
+	FillColor color.RGBA,
+	TextColor color.RGBA,
+	Label string) bool {
 	pressed := false
 	for _, evt := range frameEvents {
 		if evt.Type == EventType_MouseClick {
@@ -38,15 +28,15 @@ func (b *Button) Render(g *GPUI, area rl.Rectangle, frameEvents []Event) bool {
 		}
 	}
 	if pressed {
-		g.DrawFilledRectangle(area, b.FillColor)
+		g.DrawFilledRectangle(area, FillColor)
 	} else {
-		g.DrawRectangle(area, 2, b.FillColor)
+		g.DrawRectangle(area, 2, FillColor)
 	}
 
-	g.DrawTextAt(b.Label, b.TextSize, rl.Vector2{
+	g.DrawTextAt(Label, TextSize, rl.Vector2{
 		X: area.X + area.Width*2/3,
 		Y: area.Y + area.Height/2,
-	}, b.TextColor)
+	}, TextColor)
 
 	return pressed
 }

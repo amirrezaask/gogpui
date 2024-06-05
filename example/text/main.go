@@ -7,8 +7,7 @@ import (
 
 func main() {
 	gpui.New(func(g *gpui.GPUI, windowCtx gpui.WindowContext, frameEvents []gpui.Event) {
-		text := &gpui.Text{TextSize: 50, String: "Hello", Color: rl.White}
-		text.Render(g, windowCtx.Area(), frameEvents)
+		gpui.Text(g, windowCtx.Area(), frameEvents, 15, rl.White, "Hello")
 	}).
 		WithFont("LiberationMono.ttf").
 		Start()
