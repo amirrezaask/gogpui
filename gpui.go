@@ -10,6 +10,7 @@ import (
 type WindowContext struct {
 	Height float32
 	Width  float32
+	View   rl.Rectangle
 }
 
 func (w *WindowContext) Area() rl.Rectangle {
