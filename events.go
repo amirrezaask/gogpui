@@ -41,6 +41,10 @@ type KeyPressEvent struct {
 	KeyCode int32
 }
 
+func (k KeyPressEvent) GetAsciiChar() byte {
+	return 'A'
+}
+
 type KeyPressRepeatEvent struct {
 	Mods    uint8
 	KeyCode int32

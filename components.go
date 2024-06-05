@@ -40,6 +40,37 @@ func Button(g *GPUI,
 
 	return pressed
 }
+func Border(screenArea rl.Rectangle) rl.Rectangle {
+	return rl.Rectangle{
+		X:      screenArea.X + 1,
+		Y:      screenArea.Y + 1,
+		Width:  screenArea.Width - 1,
+		Height: screenArea.Height - 1,
+	}
+}
+
+func TextBox(g *GPUI, screanArea rl.Rectangle, frameEvents []Event, TextColor color.RGBA, lastText string) (hasFocus bool, text string) {
+	text = lastText
+	for _, evt := range frameEvents {
+		if evt.Type == EventType_MouseClick {
+			mouseClick := evt.Data.(MouseClickEvent)
+			if mouseClick.Position.X >= screanArea.X && mouseClick.Position.Y >= screanArea.Y &&
+				mouseClick.Position.X <= screanArea.X+screanArea.Width && mouseClick.Position.Y <= screanArea.Y+screanArea.Height {
+				hasFocus = true
+			}
+		} else if evt.Type == EventType_KeyPress {
+			char := evt.Data.(KeyPressEvent).GetAsciiChar()
+			if char != 0 {
+				text += string(char)
+			}
+		}
+	}
+
+	g.DrawRectangle(screanArea, 1, rl.Red)
+	g.DrawTextAt(text, 40, rl.Vector2{X: screanArea.X, Y: screanArea.Y}, rl.White)
+
+	return hasFocus, text
+}
 
 func ColumnarAreas(screenArea rl.Rectangle, columnCount int) []rl.Rectangle {
 	columnWidth := screenArea.Width / float32(columnCount)
