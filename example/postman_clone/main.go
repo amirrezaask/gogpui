@@ -17,7 +17,7 @@ func main() {
 
 		historyItemAreas := gpui.ListAreas(historyArea, 20)
 		for i, hist := range historyItemAreas {
-			gpui.Text(g, hist, frameEvents, 20, rl.White, "Hello "+fmt.Sprint(i))
+			gpui.Text("text", g, hist, frameEvents, 20, rl.White, "Hello "+fmt.Sprint(i))
 		}
 
 		URLArea := rl.Rectangle{
@@ -33,8 +33,8 @@ func main() {
 			Height: requestArea.Height * 2 / 3,
 		}
 
-		gpui.Button(g, URLArea, frameEvents, 20, rl.Red, rl.White, "URL ")
-		gpui.Button(g, responseArea, frameEvents, 20, rl.White, rl.Red, "Response ")
+		gpui.Button("button", g, URLArea, frameEvents, 20, rl.Red, rl.White, "URL ")
+		gpui.Button("button", g, responseArea, frameEvents, 20, rl.White, rl.Red, "Response ")
 		_ = codeArea
 
 	}).

@@ -6,11 +6,14 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func Text(g *GPUI, area Rectangle, frameEvents []Event, TextSize int, Color color.RGBA, String string) {
+var activeTextBoxID string
+
+func Text(id string, g *GPUI, area Rectangle, frameEvents []Event, TextSize int, Color color.RGBA, String string) {
 	g.DrawTextAt(String, TextSize, Vector2{X: area.X, Y: area.Y}, Color)
 }
 
-func Button(g *GPUI,
+func Button(id string,
+	g *GPUI,
 	area Rectangle,
 	frameEvents []Event,
 	TextSize int,
@@ -24,6 +27,7 @@ func Button(g *GPUI,
 			if mouseClick.Position.X >= area.X && mouseClick.Position.Y >= area.Y &&
 				mouseClick.Position.X <= area.X+area.Width && mouseClick.Position.Y <= area.Y+area.Height {
 				pressed = true
+				activeTextBoxID = id
 			}
 		}
 	}
@@ -49,27 +53,38 @@ func Border(screenArea Rectangle) Rectangle {
 	}
 }
 
-func TextBox(g *GPUI, screanArea rl.Rectangle, frameEvents []Event, TextColor color.RGBA, lastText string) (hasFocus bool, text string) {
-	text = lastText
+func TextBox(id string, g *GPUI, screanArea rl.Rectangle, frameEvents []Event, TextColor color.RGBA, textPointer *string) {
+	text := *textPointer
 	for _, evt := range frameEvents {
 		if evt.Type == EventType_MouseClick {
 			mouseClick := evt.Data.(MouseClickEvent)
 			if mouseClick.Position.X >= screanArea.X && mouseClick.Position.Y >= screanArea.Y &&
 				mouseClick.Position.X <= screanArea.X+screanArea.Width && mouseClick.Position.Y <= screanArea.Y+screanArea.Height {
-				hasFocus = true
-			}
-		} else if evt.Type == EventType_KeyPress {
-			char := evt.Data.(KeyPressEvent).GetAsciiChar()
-			if char != 0 {
-				text += string(char)
+				activeTextBoxID = id
 			}
 		}
 	}
 
-	g.DrawRectangle(screanArea, 1, rl.Red)
-	g.DrawTextAt(text, 40, Vector2{X: screanArea.X, Y: screanArea.Y}, rl.White)
+	if activeTextBoxID == id {
+		for _, evt := range frameEvents {
+			if evt.Type == EventType_KeyPress {
+				char := evt.Data.(KeyPressEvent).GetAsciiChar()
+				if char != 0 {
+					text += string(char)
+				}
+			}
+		}
 
-	return hasFocus, text
+		*textPointer = text
+	}
+
+	border := rl.Red
+	if activeTextBoxID == id {
+		border = rl.Blue
+	}
+	g.DrawRectangle(screanArea, 1, border)
+	g.DrawTextAt(*textPointer, 40, Vector2{X: screanArea.X, Y: screanArea.Y}, rl.White)
+
 }
 
 func ColumnarAreas(screenArea Rectangle, columnCount int) []Rectangle {

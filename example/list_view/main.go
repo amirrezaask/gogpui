@@ -11,7 +11,7 @@ func main() {
 	gpui.New(func(g *gpui.GPUI, windowCtx gpui.WindowContext, frameEvents []gpui.Event) {
 		areas := gpui.ListAreas(windowCtx.Area(), 3)
 		for i, area := range areas {
-			gpui.Button(g, area, frameEvents, 15, rl.Red, rl.White, "Button "+fmt.Sprint(i))
+			gpui.Button("button", g, area, frameEvents, 15, rl.Red, rl.White, "Button "+fmt.Sprint(i))
 		}
 	}).
 		WithFont("LiberationMono.ttf").
