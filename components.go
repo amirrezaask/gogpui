@@ -6,12 +6,12 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func Text(g *GPUI, area rl.Rectangle, frameEvents []Event, TextSize int, Color color.RGBA, String string) {
-	g.DrawTextAt(String, TextSize, rl.Vector2{X: area.X, Y: area.Y}, Color)
+func Text(g *GPUI, area Rectangle, frameEvents []Event, TextSize int, Color color.RGBA, String string) {
+	g.DrawTextAt(String, TextSize, Vector2{X: area.X, Y: area.Y}, Color)
 }
 
 func Button(g *GPUI,
-	area rl.Rectangle,
+	area Rectangle,
 	frameEvents []Event,
 	TextSize int,
 	FillColor color.RGBA,
@@ -33,14 +33,14 @@ func Button(g *GPUI,
 		g.DrawRectangle(area, 2, FillColor)
 	}
 
-	g.DrawTextAt(Label, TextSize, rl.Vector2{
+	g.DrawTextAt(Label, TextSize, Vector2{
 		X: area.X + area.Width*2/3,
 		Y: area.Y + area.Height/2,
 	}, TextColor)
 
 	return pressed
 }
-func Border(screenArea rl.Rectangle) rl.Rectangle {
+func Border(screenArea Rectangle) Rectangle {
 	return rl.Rectangle{
 		X:      screenArea.X + 1,
 		Y:      screenArea.Y + 1,
@@ -67,16 +67,16 @@ func TextBox(g *GPUI, screanArea rl.Rectangle, frameEvents []Event, TextColor co
 	}
 
 	g.DrawRectangle(screanArea, 1, rl.Red)
-	g.DrawTextAt(text, 40, rl.Vector2{X: screanArea.X, Y: screanArea.Y}, rl.White)
+	g.DrawTextAt(text, 40, Vector2{X: screanArea.X, Y: screanArea.Y}, rl.White)
 
 	return hasFocus, text
 }
 
-func ColumnarAreas(screenArea rl.Rectangle, columnCount int) []rl.Rectangle {
+func ColumnarAreas(screenArea Rectangle, columnCount int) []Rectangle {
 	columnWidth := screenArea.Width / float32(columnCount)
 	var columns []rl.Rectangle
 	for i := 0; i < columnCount; i++ {
-		columns = append(columns, rl.Rectangle{
+		columns = append(columns, Rectangle{
 			X:      float32(i)*columnWidth + screenArea.X,
 			Width:  columnWidth,
 			Y:      screenArea.Y,
@@ -87,11 +87,11 @@ func ColumnarAreas(screenArea rl.Rectangle, columnCount int) []rl.Rectangle {
 	return columns
 }
 
-func ListAreas(screenArea rl.Rectangle, listItemCount int) []rl.Rectangle {
+func ListAreas(screenArea Rectangle, listItemCount int) []Rectangle {
 	itemHeight := screenArea.Height / float32(listItemCount)
-	var items []rl.Rectangle
+	var items []Rectangle
 	for i := 0; i < listItemCount; i++ {
-		items = append(items, rl.Rectangle{
+		items = append(items, Rectangle{
 			X:      screenArea.X,
 			Width:  screenArea.Width,
 			Y:      float32(i)*itemHeight + screenArea.Y,
@@ -102,7 +102,7 @@ func ListAreas(screenArea rl.Rectangle, listItemCount int) []rl.Rectangle {
 	return items
 }
 
-func GridAreas(screenArea rl.Rectangle, rowsCount int, columnsCount int) []rl.Rectangle {
+func GridAreas(screenArea Rectangle, rowsCount int, columnsCount int) []Rectangle {
 	var items []rl.Rectangle
 	columns := ColumnarAreas(screenArea, columnsCount)
 	for _, col := range columns {

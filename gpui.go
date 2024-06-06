@@ -7,6 +7,10 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type Rectangle = rl.Rectangle
+type Vector2 = rl.Vector2
+type Font = rl.Font
+
 type WindowContext struct {
 	Height float32
 	Width  float32
@@ -27,23 +31,23 @@ type Handler func(g *GPUI, windowContext WindowContext, frameEvents []Event)
 type GPUI struct {
 	fontName string
 	fontData []byte
-	fontMap  map[int]rl.Font
+	fontMap  map[int]Font
 	handler  Handler
 }
 
-func (g *GPUI) DrawTextAt(text string, fontsize int, at rl.Vector2, c color.RGBA) {
+func (g *GPUI) DrawTextAt(text string, fontsize int, at Vector2, c color.RGBA) {
 	rl.DrawTextEx(g.GetFont(fontsize), text, rl.Vector2{X: at.X, Y: at.Y}, float32(fontsize), 0, c)
 }
 
-func (g *GPUI) DrawRectangle(area rl.Rectangle, lineThick int, borderColor color.RGBA) {
+func (g *GPUI) DrawRectangle(area Rectangle, lineThick int, borderColor color.RGBA) {
 	rl.DrawRectangleLinesEx(area, 2, borderColor)
 }
 
-func (g *GPUI) DrawFilledRectangle(area rl.Rectangle, fillColor color.RGBA) {
+func (g *GPUI) DrawFilledRectangle(area Rectangle, fillColor color.RGBA) {
 	rl.DrawRectangleRec(area, fillColor)
 }
 
-func (g *GPUI) GetFont(fontSize int) rl.Font {
+func (g *GPUI) GetFont(fontSize int) Font {
 	if font, exists := g.fontMap[fontSize]; exists {
 		return font
 	}
@@ -60,7 +64,7 @@ func (g *GPUI) WithFont(font string) *GPUI {
 }
 
 func New(handler Handler) *GPUI {
-	return &GPUI{handler: handler, fontMap: make(map[int]rl.Font)}
+	return &GPUI{handler: handler, fontMap: make(map[int]Font)}
 }
 
 func (g *GPUI) Start() {
