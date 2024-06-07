@@ -29,10 +29,11 @@ func (w *WindowContext) Area() rl.Rectangle {
 type Handler func(g *GPUI, windowContext WindowContext, frameEvents []Event)
 
 type GPUI struct {
-	fontName string
-	fontData []byte
-	fontMap  map[int]Font
-	handler  Handler
+	fontName        string
+	fontData        []byte
+	fontMap         map[int]Font
+	handler         Handler
+	activeTextBoxID string
 }
 
 func (g *GPUI) DrawTextAt(text string, fontsize int, at Vector2, c color.RGBA) {

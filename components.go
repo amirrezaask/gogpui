@@ -6,14 +6,11 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-var activeTextBoxID string
-
-func Text(id string, g *GPUI, area Rectangle, frameEvents []Event, TextSize int, Color color.RGBA, String string) {
+func (g *GPUI) Text(area Rectangle, frameEvents []Event, TextSize int, Color color.RGBA, String string) {
 	g.DrawTextAt(String, TextSize, Vector2{X: area.X, Y: area.Y}, Color)
 }
 
-func Button(id string,
-	g *GPUI,
+func (g *GPUI) Button(
 	area Rectangle,
 	frameEvents []Event,
 	TextSize int,
@@ -27,7 +24,6 @@ func Button(id string,
 			if mouseClick.Position.X >= area.X && mouseClick.Position.Y >= area.Y &&
 				mouseClick.Position.X <= area.X+area.Width && mouseClick.Position.Y <= area.Y+area.Height {
 				pressed = true
-				activeTextBoxID = id
 			}
 		}
 	}
@@ -44,7 +40,8 @@ func Button(id string,
 
 	return pressed
 }
-func Border(screenArea Rectangle) Rectangle {
+
+func (g *GPUI) Border(screenArea Rectangle) Rectangle {
 	return rl.Rectangle{
 		X:      screenArea.X + 1,
 		Y:      screenArea.Y + 1,
@@ -53,19 +50,24 @@ func Border(screenArea Rectangle) Rectangle {
 	}
 }
 
-func TextBox(id string, g *GPUI, screanArea rl.Rectangle, frameEvents []Event, TextColor color.RGBA, textPointer *string) {
+func (g *GPUI) TextBox(
+	id string,
+	screanArea rl.Rectangle,
+	frameEvents []Event,
+	TextColor color.RGBA,
+	textPointer *string) {
 	text := *textPointer
 	for _, evt := range frameEvents {
 		if evt.Type == EventType_MouseClick {
 			mouseClick := evt.Data.(MouseClickEvent)
 			if mouseClick.Position.X >= screanArea.X && mouseClick.Position.Y >= screanArea.Y &&
 				mouseClick.Position.X <= screanArea.X+screanArea.Width && mouseClick.Position.Y <= screanArea.Y+screanArea.Height {
-				activeTextBoxID = id
+				g.activeTextBoxID = id
 			}
 		}
 	}
 
-	if activeTextBoxID == id {
+	if g.activeTextBoxID == id {
 		for _, evt := range frameEvents {
 			if evt.Type == EventType_KeyPress {
 				char := evt.Data.(KeyPressEvent).GetAsciiChar()
@@ -79,12 +81,11 @@ func TextBox(id string, g *GPUI, screanArea rl.Rectangle, frameEvents []Event, T
 	}
 
 	border := rl.Red
-	if activeTextBoxID == id {
+	if g.activeTextBoxID == id {
 		border = rl.Blue
 	}
 	g.DrawRectangle(screanArea, 1, border)
 	g.DrawTextAt(*textPointer, 40, Vector2{X: screanArea.X, Y: screanArea.Y}, rl.White)
-
 }
 
 func ColumnarAreas(screenArea Rectangle, columnCount int) []Rectangle {

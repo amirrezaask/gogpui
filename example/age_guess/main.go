@@ -14,15 +14,14 @@ func main() {
 	gpui.New(func(g *gpui.GPUI, windowCtx gpui.WindowContext, frameEvents []gpui.Event) {
 		windowArea := windowCtx.Area()
 
-		gpui.TextBox("textbox", g, gpui.Rectangle{
+		g.TextBox("#age", gpui.Rectangle{
 			X:      windowArea.X + (windowArea.Width)*1/4,
 			Y:      windowArea.Y + (windowArea.Height)*1/2,
 			Width:  windowArea.Width * 1 / 5,
 			Height: windowArea.Height * 1 / 10,
 		}, frameEvents, rl.Red, &birth)
 
-		pressed := gpui.Button("button",
-			g,
+		pressed := g.Button(
 			gpui.Rectangle{
 				X:      windowArea.X + (windowArea.Width)*1/4,
 				Y:      windowArea.Y + (windowArea.Height)*3/4,
@@ -47,4 +46,3 @@ func main() {
 		WithFont("LiberationMono.ttf").
 		Start()
 }
-
